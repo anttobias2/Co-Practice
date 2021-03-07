@@ -20,7 +20,10 @@ public class Yahtzee
 	// Play one round of the game of yahtzee
 	public void PlayOnce()
 	{
-		int [] scores = new int[numTurns];
+		//int [] scores = new int[numTurns];
+		ArrayList<Integer> scores = new ArrayList<>();
+		for(int i = 0; i < numTurns; i++)
+			scores.add(0);
 		// Read in values and display to user
 		ReadFile();
 		
@@ -33,14 +36,15 @@ public class Yahtzee
 		while(turn < numTurns)
 		{
 			// create an array for hand of dice based on values given
-			int[] handOfDice = new int[numDice + 1];
+			//int[] handOfDice = new int[numDice + 1];
+			ArrayList<Integer> handOfDice = new ArrayList<>();
 			int keepDie = 0;
 			int playersTurn = 1;
 			
 			// create create starting hand
 			for(int i = 0; i < numDice; i++)
 			{
-				handOfDice[i] = RollDie();
+				handOfDice.add(i,RollDie());
 			}
 			
 			// play until user wants to keep all dice or used all rolls
@@ -65,7 +69,7 @@ public class Yahtzee
 		}
 	}
 
-	public void CheckHand(int dice[])
+	public void CheckHand(ArrayList<Integer> dice)
 	{
 		// Checks and prints score for integers 1-6
 		for(int i = 1; i <= numSides; i++)
@@ -130,18 +134,18 @@ public class Yahtzee
 	}
 	
 	// Displays user's hand of dice
-	public void DisplayDiceNums(int dice[])
+	public void DisplayDiceNums(ArrayList<Integer> dice)
 	{
 		for(int i = 0; i < numDice; i++)
 		{
-			System.out.print(dice[i] + " ");
+			System.out.print(dice.get(i) + " ");
 		}
 			
 			System.out.println();
 	}
 	
 	// Take input from user to choose which dice to keep and which to reroll 
-	public int ChooseDice(int dice[])
+	public int ChooseDice(ArrayList<Integer> dice)
 	{
 		Scanner in = new Scanner(System.in);
 		String keepOrReroll = "";
@@ -153,7 +157,7 @@ public class Yahtzee
 		for(int diePosition = 0; diePosition < numDice; diePosition++)
 		{
 			if(keepOrReroll.charAt(diePosition) == 'n')
-				dice[diePosition] = RollDie();
+				dice.set(diePosition, RollDie());
 			else	
 				keep++;
 		}
@@ -162,7 +166,7 @@ public class Yahtzee
 	}
 	
 	// Checks user's hand for 3 or 4 of a kind
-	public int CheckOfAKind(int dice[])
+	public int CheckOfAKind(ArrayList<Integer> dice)
 	{
 		int maxCount = 0;
 		int currentCount;
@@ -174,7 +178,7 @@ public class Yahtzee
 			
 			for(int diePosition = 0; diePosition < numDice; diePosition++)
 			{
-				if(dice[diePosition] == dieValue)
+				if(dice.get(diePosition) == dieValue)
 					currentCount++;
 			}
 			
@@ -186,20 +190,20 @@ public class Yahtzee
 	}
 	
 	// Returns sum of user's hand of dice
-	public int AddTotalDice(int dice[])
+	public int AddTotalDice(ArrayList<Integer> dice)
 	{
 		int diceSum = 0;
 		
 		for(int i = 0; i < numDice; i++)
 		{
-			diceSum = diceSum + dice[i];
+			diceSum = diceSum + dice.get(i);
 		}
 		
 		return diceSum;
 	}
 	
 	 // Sort dice in ascending order to keep track and check hand easier
-	public void SortDice(int dice[])
+	public void SortDice(ArrayList<Integer> dice)
 	{
 		boolean swap;
 		int temp;
@@ -210,11 +214,11 @@ public class Yahtzee
 			
 			for(int dieNum = 0; dieNum < numDice-1; dieNum++)
 			{
-				if(dice[dieNum] > dice[dieNum+1])
+				if(dice.get(dieNum) > dice.get(dieNum+1))
 				{
-					temp = dice[dieNum];
-					dice[dieNum] = dice[dieNum+1];
-					dice[dieNum+1] = temp;
+					temp = dice.get(dieNum);
+					dice.set(dieNum, dice.get(dieNum+1));
+					dice.set(dieNum+1, temp);
 					swap = true;
 				}
 			}
@@ -222,7 +226,7 @@ public class Yahtzee
 	}
 	
 	// Checks user's hand for small and large straight
-	public int CheckStraights(int dice[])
+	public int CheckStraights(ArrayList<Integer> dice)
 	{
 		int maxStraight = 1;
 		int currentStraight = 1;
@@ -230,7 +234,7 @@ public class Yahtzee
 		for(int i = 0; i < numDice - 1; i++)
 		{
 			// checks if next number is one greater than previous 
-			if(dice[i] + 1 == dice[i+1])
+			if(dice.get(i) + 1 == dice.get(i+1))
 				currentStraight++;
 			// if last 2 numbers are the same, length stays the same
 			else
@@ -244,7 +248,7 @@ public class Yahtzee
 	}
 	
 	// Checks user's hand for full house
-	public boolean CheckFullHouse(int dice[])
+	public boolean CheckFullHouse(ArrayList<Integer> dice)
 	{
 		boolean fullHouse = false;
 		boolean found2ofAKind = false;
@@ -258,7 +262,7 @@ public class Yahtzee
 			
 			for(int diePosition = 0; diePosition < numDice; diePosition++)
 			{
-				if(dice[diePosition] == dieValue)
+				if(dice.get(diePosition) == dieValue)
 					currentCount++;
 			}
 			
@@ -276,14 +280,14 @@ public class Yahtzee
 	}
 
 	// Returns the score of a single die value in user's hand
-	public int CheckInts(int dice[], int dieValue)
+	public int CheckInts(ArrayList<Integer> dice, int dieValue)
 	{
 		int sameNum = 0;
 		int score;
 		
 		for(int diePosition = 0; diePosition < numDice; diePosition++)
 		{
-			if(dice[diePosition] == dieValue)
+			if(dice.get(diePosition) == dieValue)
 				sameNum++;
 		}
 		
@@ -293,14 +297,14 @@ public class Yahtzee
 	}
 	
 	// Check's user's hand for a yahtzee
-	public boolean CheckYahtzee(int dice [])
+	public boolean CheckYahtzee(ArrayList<Integer> dice)
 	{
 		int numSameValue = 0;
-		int dieValue = dice[0];
+		int dieValue = dice.get(0);
 		
 		for(int i = 0; i < numDice; i++)
 		{
-			if(dice[i] == dieValue)
+			if(dice.get(i) == dieValue)
 				numSameValue++;
 		}
 		
@@ -418,7 +422,7 @@ public class Yahtzee
 		{System.out.println(e.getMessage());}
 	}
 	
-	private void ChooseScore(int scoringArr[])
+	private void ChooseScore(ArrayList<Integer> scoringArray)
 	{
 		Scanner in = new Scanner(System.in);
 		int score;
