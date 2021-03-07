@@ -15,22 +15,37 @@ public class Yahtzee
 	private int numSides;
 	private int numDice;
 	private int numRolls;
-	private int numTurns = numSides + 7; // 7 is the number of scores on the lower scorecard
-	
+	private int numTurns; 
+	// make an array for the Player 
+	ArrayList<Integer> usersScores = new ArrayList<>();
+		
 	// Play one round of the game of yahtzee
 	public void PlayOnce()
 	{
-		//int [] scores = new int[numTurns];
-		ArrayList<Integer> scores = new ArrayList<>();
-		for(int i = 0; i < numTurns; i++)
-			scores.add(0);
+		
+		
 		// Read in values and display to user
 		ReadFile();
 		
+		ArrayList<Integer> roundScores = new ArrayList<>();
+		
+		// put zeros in both arrays and make them long enough to 
+
+		PrintGameRules();
 		PrintInfo();
 		// Let user change if they would like and display info again
 		SetInfo();
 		PrintInfo();
+		
+		numTurns = numSides + 7;
+		for(int i = 0; i < numTurns; i++)
+		{
+			roundScores.add(0);
+			usersScores.add(0);
+		}
+		
+		System.out.println(usersScores.size());
+		System.out.println(roundScores.size());
 		
 		int turn = 0;
 		while(turn < numTurns)
@@ -62,66 +77,98 @@ public class Yahtzee
 			System.out.println("Here is you final hand:");
 			DisplayDiceNums(handOfDice);
 			// check and display scores for each section of the game for user's hand of dice
-			CheckHand(handOfDice);
+			CheckHand(handOfDice, roundScores);
+			ChooseScore(roundScores);
 			turn++;
 			
 			System.out.println("\nHere is you next hand: ");
 		}
 	}
 
-	public void CheckHand(ArrayList<Integer> dice)
+	public void CheckHand(ArrayList<Integer> dice, ArrayList<Integer> roundScores)
 	{
 		// Checks and prints score for integers 1-6
 		for(int i = 1; i <= numSides; i++)
 		{
-			System.out.println(i + "'s Score: " + CheckInts(dice, i));
+			System.out.println(i + ": " + i + "'s Score: " + CheckInts(dice, i));
+			roundScores.set(i-1, CheckInts(dice, i));
 		}
 
 		// Checks and prints 3 and 4 of a kind scores
 		if(CheckOfAKind(dice) >= 3)
 		{
-			System.out.println("3 of a Kind Score: " + AddTotalDice(dice));
+			System.out.println((numSides + 1) + ": " + "3 of a Kind Score: " + AddTotalDice(dice));
+			roundScores.set((numSides), AddTotalDice(dice));
 		}
+		
 		else
-			System.out.println("3 of a Kind Score: 0");
+		{
+			System.out.println((numSides + 1) + ": " + "3 of a Kind Score: 0");
+			roundScores.set((numSides), 0);
+		}
 		
 		if(CheckOfAKind(dice) >= 4)
 		{
-			System.out.println("4 of a Kind Score: " + AddTotalDice(dice));
+			System.out.println((numSides + 2) + ": " + "4 of a Kind Score: " + AddTotalDice(dice));
+			roundScores.set((numSides + 1), AddTotalDice(dice));
 		}
 		else
-			System.out.println("4 of a Kind Score: 0");
-
+		{
+			System.out.println((numSides + 2) + ": " + "4 of a Kind Score: 0");
+			roundScores.set((numSides + 1), 0);
+		}
 
 		// Checks and prints Full House score	
 		if(CheckFullHouse(dice))
-			System.out.println("Full House Score: 25");
+		{
+			System.out.println((numSides + 3) + ": " + "Full House Score: 25");
+			roundScores.set((numSides + 2), 25);
+		}
 		else
-			System.out.println("Full House Score: 0");
+		{
+			System.out.println((numSides + 3) + ": " + "Full House Score: 0");
+			roundScores.set((numSides + 2), 0);
+		}
 			
 		// Checks and prints Small and Large Straight scores
 		if(CheckStraights(dice) >= numDice - 1)
 		{
-			System.out.println("Small Straight Score: 30");
+			System.out.println((numSides + 4) + ": " + "Small Straight Score: 30");
+			roundScores.set((numSides + 3), 30);
 		}
 		else
-			System.out.println("Small Straight Score: 0");
+		{
+			System.out.println((numSides + 4) + ": " + "Small Straight Score: 0");
+			roundScores.set((numSides + 3), 0);
+		}
 		
 		if(CheckStraights(dice) == numDice)
 		{
-			System.out.println("Large Straight Score: 40");
+			System.out.println((numSides + 5) + ": " + "Large Straight Score: 40");
+			roundScores.set((numSides + 4), 40);
 		}
 		else
-			System.out.println("Large Straight Score: 0");
+		{
+			System.out.println((numSides + 5) + ": " + "Large Straight Score: 0");
+			roundScores.set((numSides + 4), 0);
+		}
 			
 		// Checks and prints yahtzee score
 		if(CheckYahtzee(dice))
-			System.out.println("Yahtzee Score: 50");
+		{
+			System.out.println((numSides + 6) + ": " + "Yahtzee Score: 50");
+			roundScores.set((numSides + 5), 50);
+		}
 		else
-			System.out.println("Yahtzee Score: 0");
-			
+		{
+			System.out.println((numSides + 6) + ": " + "Yahtzee Score: 0");
+			roundScores.set((numSides + 5), 0);
+		}
+		
 		// Prints chance score
-		System.out.println("Chance Score: " + AddTotalDice(dice));
+		System.out.println((numSides + 7) + ": Chance Score: " + AddTotalDice(dice));
+		roundScores.set((numSides + 6), AddTotalDice(dice));
+		
 	}
 	
 	
@@ -172,7 +219,7 @@ public class Yahtzee
 		int currentCount;
 		
 		// checks the number of dice in hand for each value of the dice sides
-		for(int dieValue = 1; dieValue < numSides; dieValue++)
+		for(int dieValue = 1; dieValue <= numSides; dieValue++)
 		{
 			currentCount = 0;
 			
@@ -429,10 +476,28 @@ public class Yahtzee
 		
 		System.out.print("Which score would you like to choose for this round?: ");
 		score = in.nextInt();
+		usersScores.set(score - 1, scoringArray.get(score-1)); 
 	}
 	
-
-
+	private void PrintGameRules()
+	{
+		System.out.println("After each round choose which scoring number (Displayed on left side of screen) you would like to keep for your score. You may only keep each score once besides a yahtzee.\n");
+	}
+	
+	private int CalcTop()
+	{
+		int totalTop = 0;
+		
+		return totalTop;
+	}
+	
+	private int CalcBottom()
+	{
+		int totalBottom = 0;
+		
+		return totalBottom;
+	}
+	
 	// main function allows user to play as many times as they would like
 	public static void main(String args[])
 	{
