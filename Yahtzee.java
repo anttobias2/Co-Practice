@@ -15,29 +15,31 @@ public class Yahtzee
 	private int numSides;
 	private int numDice;
 	private int numRolls;
-	private int numTurns; 
-	// make an array for the Player 
+	private int numTurns;
+	private int bottomScore;
+	private int topScore;	
+	
+	// make an array for the Players saved scores
 	ArrayList<Integer> usersScores = new ArrayList<>();
 		
 	// Play one round of the game of yahtzee
 	public void PlayOnce()
 	{
-		
+		// number of turns in the game is the sides of die plus 7 bottom scores
+		numTurns = numSides + 7;
 		
 		// Read in values and display to user
 		ReadFile();
-		
+		// Create array to store scores for a single round
 		ArrayList<Integer> roundScores = new ArrayList<>();
-		
-		// put zeros in both arrays and make them long enough to 
 
-		PrintGameRules();
 		PrintInfo();
 		// Let user change if they would like and display info again
 		SetInfo();
 		PrintInfo();
 		
-		numTurns = numSides + 7;
+		
+		// put zeros in both arrays and make them long enough to hold all scores
 		for(int i = 0; i < numTurns; i++)
 		{
 			roundScores.add(0);
@@ -50,6 +52,7 @@ public class Yahtzee
 		int turn = 0;
 		while(turn < numTurns)
 		{
+			System.out.println("Here is your hand: ");
 			// create an array for hand of dice based on values given
 			//int[] handOfDice = new int[numDice + 1];
 			ArrayList<Integer> handOfDice = new ArrayList<>();
@@ -79,10 +82,13 @@ public class Yahtzee
 			// check and display scores for each section of the game for user's hand of dice
 			CheckHand(handOfDice, roundScores);
 			ChooseScore(roundScores);
+			DisplayScore();
 			turn++;
 			
-			System.out.println("\nHere is you next hand: ");
+			
 		}
+		
+		DisplayScore();
 	}
 
 	public void CheckHand(ArrayList<Integer> dice, ArrayList<Integer> roundScores)
@@ -469,41 +475,73 @@ public class Yahtzee
 		{System.out.println(e.getMessage());}
 	}
 	
+	// Choose which score to keep after each round
 	private void ChooseScore(ArrayList<Integer> scoringArray)
 	{
 		Scanner in = new Scanner(System.in);
 		int score;
 		
-		System.out.print("Which score would you like to choose for this round?: ");
+		System.out.print("\nWhich score would you like to choose for this round?: ");
 		score = in.nextInt();
+		
+		// Players cannot pick the same score twice
+		while(usersScores.get(score - 1) != 0)
+		{
+			System.out.print("You already have a score for this section. Choose again: ");
+			score = in.nextInt();
+		}
 		usersScores.set(score - 1, scoringArray.get(score-1)); 
+		
 	}
 	
-	private void PrintGameRules()
+	// Introduction to the game
+	public void PrintIntroduction()
 	{
 		System.out.println("After each round choose which scoring number (Displayed on left side of screen) you would like to keep for your score. You may only keep each score once besides a yahtzee.\n");
 	}
 	
+	// Calculate the total of the top scorecard
 	private int CalcTop()
 	{
 		int totalTop = 0;
 		
+		for(int i = 0; i < numSides; i++)
+			totalTop += usersScores.get(i);
 		return totalTop;
 	}
 	
+	// Calculate the total of the bottom scorecard
 	private int CalcBottom()
 	{
 		int totalBottom = 0;
 		
+		for(int i = numSides; i < numSides + 7; i++)
+			totalBottom += usersScores.get(i);
+			
+		if(totalBottom >= 63)
+			totalBottom += 35;
+			
 		return totalBottom;
 	}
 	
+	// Display the scores of the top and bottom sections of the scorecard
+	private void DisplayScore()
+	{
+		int topScore = CalcTop();
+		int bottomScore = CalcBottom();
+		int totalScore = topScore + bottomScore;
+		
+		System.out.println("\nTop Scorecard Total: " + topScore);
+		System.out.println("Bottom Scorecard Total: " + bottomScore);
+		System.out.println("Total: " + totalScore + "\n");
+	}
 	// main function allows user to play as many times as they would like
 	public static void main(String args[])
 	{
 		// creates yahtzee object
 		Yahtzee game = new Yahtzee();
 		
+		game.PrintIntroduction();
 		// plays one round until user decides to stop
 		do
 		{
